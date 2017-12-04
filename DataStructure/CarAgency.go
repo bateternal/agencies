@@ -49,6 +49,7 @@ type LinkListService struct{
 
 
 func (ll *LinkListAgency) Append(Name string){
+	ll.lock.Lock()
 	agency := Agency{Name,nil,nil}
 	if ll.head == nil {
 		ll.head = &agency
@@ -67,6 +68,7 @@ func (ll *LinkListAgency) Append(Name string){
 }
 
 func (ll LinkListService) Append(serviceName string,carModel string,description string,technicalDescription string,expense string){
+	ll.lock.Lock()
 	service := Service{serviceName,carModel,description,technicalDescription,expense,nil,nil,nil,nil}
 	if ll.head == nil {
 		ll.head = &service
