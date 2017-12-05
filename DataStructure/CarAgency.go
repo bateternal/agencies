@@ -41,11 +41,15 @@ type LinkListService struct{
 
 func remove(s []*Service, i *Service) []*Service {
 	var j int
-	var f int
+	f := len(s)
 	for j=0 ;j<len(s);j++{
 		if s[j] == i {
 			f = j
 		}
+	}
+	if f == len(s){
+		fmt.Println("service not found!")
+		return s
 	}
 	s[f] = s[len(s)-1]
 	return s[:len(s)-1]
@@ -108,12 +112,14 @@ func (s *Service) AddSubService(service *Service){
 	s.lock.Lock()
 }
 
-func (a *Agency) AddOffer(service *Service){
+func (a *Agency) AddOffer(service *Service) *Agency{
 	a.services = append(a.services,service)
+	return a
 }
 
-func (a *Agency) Delete(service *Service){
+func (a *Agency) Delete(service *Service) *Agency{
 	a.services = remove( a.services , service)
+	return a
 }
 
 
