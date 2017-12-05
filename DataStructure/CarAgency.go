@@ -2,19 +2,8 @@ package DataStructure
 
 import (
 	"sync"
+	"fmt"
 )
-
-type list interface{
-	createList()
-	Append()
-	Insert()
-	IndexOf()
-	IsEmpty()
-	String()
-	Head()
-	Size()
-}
-
 
 type Service struct {
 	ServiceName          string
@@ -23,9 +12,10 @@ type Service struct {
 	TechnicalDescription string
 	Expense              string
 	next                 *Service
-	downFirst            *Service
+	dNext            *Service
 	sizeDown             int
 	sizeFather           int
+	lock sync.RWMutex
 }
 
 
@@ -33,6 +23,7 @@ type Agency struct {
 	AgencyName string
 	services   []*Service
 	next       *Agency
+	lock sync.RWMutex
 }
 
 type LinkListAgency struct{
@@ -48,11 +39,24 @@ type LinkListService struct{
 }
 
 
-func (ll *LinkListAgency) Append(Name string){
+func remove(s []*Service, i *Service) []*Service {
+	var j int
+	var f int
+	for j=0 ;j<len(s);j++{
+		if s[j] == i {
+			f = j
+		}
+	}
+	s[f] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+
+func (ll *LinkListAgency) AddAgency(agency *Agency){
 	ll.lock.Lock()
-	agency := Agency{Name,nil,nil}
+
 	if ll.head == nil {
-		ll.head = &agency
+		ll.head = agency
 	} else {
 		last := ll.head
 		for {
@@ -61,17 +65,17 @@ func (ll *LinkListAgency) Append(Name string){
 			}
 			last = last.next
 		}
-		last.next = &agency
+		last.next = agency
 	}
 	ll.size++
 	ll.lock.Unlock()
 }
 
-func (ll LinkListService) Append(serviceName string,carModel string,description string,technicalDescription string,expense string){
+func (ll *LinkListService) AddService(service *Service){
 	ll.lock.Lock()
-	service := Service{serviceName,carModel,description,technicalDescription,expense,nil,nil,nil,nil}
+
 	if ll.head == nil {
-		ll.head = &service
+		ll.head = service
 	} else {
 		last := ll.head
 		for {
@@ -80,9 +84,37 @@ func (ll LinkListService) Append(serviceName string,carModel string,description 
 			}
 			last = last.next
 		}
-		last.next = &service
+		last.next = service
 	}
 	ll.size++
 	ll.lock.Unlock()
 }
+
+func (s *Service) AddSubService(service *Service){
+	s.lock.Lock()
+	if s.dNext == nil{
+		s.dNext = service
+	}else{
+		last := s.dNext
+		for{
+			if last.dNext == nil{
+				break
+			}
+			last = last.dNext
+		}
+		last.dNext = service
+	}
+	s.sizeDown++
+	s.lock.Lock()
+}
+
+func (a *Agency) AddOffer(service *Service){
+	a.services = append(a.services,service)
+}
+
+func (a *Agency) Delete(service *Service){
+	a.services = remove( a.services , service)
+}
+
+
 
