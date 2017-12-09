@@ -33,6 +33,44 @@ type LinkListService struct {
 	size int
 }
 
+func (ll *LinkListService) RemoveAt(i int){
+	if i < 0 || i > ll.size {
+		fmt.Errorf("Index out of bounds")
+	}
+	node := ll.head
+	if i == 0{
+		ll.head = node.next
+	}else {
+		j := 0
+		for j < i-1 {
+			j++
+			node = node.next
+		}
+		remove := node.next
+		node.next = remove.next
+	}
+	ll.size--
+	fmt.Println("deleted")
+}
+
+// IndexOf returns the position of the Item t
+func (ll *LinkListService) IndexOf(ServiceName string) int {
+	node := ll.head
+
+	j := 0
+	for {
+		if node.ServiceName == ServiceName {
+			return j
+		}
+		if node.next == nil {
+			return -1
+		}
+		node = node.next
+		j++
+	}
+}
+
+
 func remove(s []*Service, i *Service) []*Service {
 	var j int
 	f := len(s)
@@ -95,21 +133,29 @@ func (s *Service) AddSubService(service *Service) {
 }
 
 func (a *Agency) AddOffer(service *Service) {
-	service.sizeFather++
+	if service.sizeFather == 0{
+		service.sizeFather = 1
+	}else {
+		service.sizeFather++
+	}
 	a.services = append(a.services, service)
 }
 
-func (a *Agency) Delete(service *Service) {
+func (a *Agency) Delete(service *Service,ll *LinkListService) {
 	a.services = remove(a.services, service)
+	service.sizeFather--
 	if service.sizeFather == 0{
-		head := service.dNext
+		var index int
+		index = ll.IndexOf(service.ServiceName)
+		ll.RemoveAt(index)
+		head := service
 		service = nil
 		for{
-			if head == nil{
+			if head.dNext == nil{
 				break
 			}
 			headI := head.dNext
-			head = nil
+			head.dNext = nil
 			head = headI
 		}
 	}
@@ -186,17 +232,48 @@ func (a *Agency) Order(s *Service,Lvl int) {
 func (a *Agency) ListOrder(){
 	i:=0
 	for ; i<len(a.order0);i++{
-		fmt.Print(a.order0[i])
+		fmt.Println(a.order0[i].ServiceName)
 	}
-	fmt.Println()
 	i=0
 	for ; i<len(a.order1);i++{
-		fmt.Print(a.order1[i])
+		fmt.Println(a.order1[i].ServiceName)
 	}
-	fmt.Println()
 	i=0
 	for ; i<len(a.order2);i++{
-		fmt.Print(a.order2[i])
+		fmt.Println(a.order2[i].ServiceName)
 	}
-	fmt.Println()
+}
+
+func (ll *LinkListService) Search(serviceName string) *Service{
+	head := ll.head
+	for {
+		if head.ServiceName == serviceName{
+			return head
+		}
+		if head.next == nil{
+			break
+		}
+		head = head.next
+	}
+	 fmt.Println("This service does not exist!")
+	 return nil
+}
+
+func (ll *LinkListAgency) Search(agencyName string) *Agency{
+	head := ll.head
+	if head == nil{
+		fmt.Println("no service already exist!")
+		return nil
+	}
+	for {
+		if head.AgencyName == agencyName{
+			return head
+		}
+		if head.next == nil{
+			break
+		}
+		head = head.next
+	}
+	fmt.Println("This service does not exist!")
+	return nil
 }
