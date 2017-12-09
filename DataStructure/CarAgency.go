@@ -148,6 +148,9 @@ func (ll *LinkListService) ListServices() {
 				}
 			}
 			fmt.Print("]\n")
+			if head.next == nil{
+				break
+			}
 			head = head.next
 		}
 	}
