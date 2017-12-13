@@ -11,7 +11,7 @@ type Service struct {
 	TechnicalDescription string
 	Expense              string
 	next                 *Service
-	dNext                *Service
+	head                 *Service
 	sizeFather           int
 }
 
@@ -102,6 +102,7 @@ func (ll *LinkListAgency) AddAgency(agency *Agency) {
 	}
 }
 
+
 func (ll *LinkListService) AddService(service *Service) {
 	if ll.head == nil {
 		ll.head = service
@@ -118,17 +119,17 @@ func (ll *LinkListService) AddService(service *Service) {
 }
 
 func (s *Service) AddSubService(service *Service) {
-	if s.dNext == nil {
-		s.dNext = service
+	if s.head == nil {
+		s.head = service
 	} else {
-		last := s.dNext
+		last := s.head
 		for {
-			if last.dNext == nil {
+			if last.next == nil {
 				break
 			}
-			last = last.dNext
+			last = last.next
 		}
-		last.dNext = service
+		last.next = service
 	}
 }
 
@@ -141,23 +142,17 @@ func (a *Agency) AddOffer(service *Service) {
 	a.services = append(a.services, service)
 }
 
+
+
 func (a *Agency) Delete(service *Service,ll *LinkListService) {
 	a.services = remove(a.services, service)
 	service.sizeFather--
-	if service.sizeFather == 0{
+	if service.sizeFather == 0 {
 		var index int
 		index = ll.IndexOf(service.ServiceName)
 		ll.RemoveAt(index)
-		head := service
+		service.head = nil
 		service = nil
-		for{
-			if head.dNext == nil{
-				break
-			}
-			headI := head.dNext
-			head.dNext = nil
-			head = headI
-		}
 	}
 }
 
@@ -176,7 +171,7 @@ func (ll *LinkListAgency) ListAgencies() {
 	}
 }
 
-func (ll *LinkListService) ListServices() {
+func (ll *LinkListService) ListServices(){
 	head := ll.head
 	if head == nil {
 		fmt.Println("This list is empty!")
@@ -203,9 +198,9 @@ func (ll *LinkListService) ListServices() {
 }
 
 func (s *Service) ListSubServices() {
-	head := s.dNext
+	head := s.head
 	if head == nil {
-		fmt.Println("not exist!")
+		return
 	} else {
 		for {
 			fmt.Print(head.ServiceName + " ,")
@@ -217,7 +212,6 @@ func (s *Service) ListSubServices() {
 	}
 	fmt.Println()
 }
-
 func (a *Agency) Order(s *Service,Lvl int) {
 	switch Lvl {
 	case 0:
