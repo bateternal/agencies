@@ -213,10 +213,25 @@ func (a *Agency) Order(s *Service, Lvl int) {
 	i :=  Lvl*1000 - (len(mHeap.Orders) + 1)
 	order = Order{s,i}
 	mHeap.Insert(order)
-
 }
 
-func (a *Agency) ListOrder() {}
+func (a *Agency) ListOrder() {
+	mHeap := a.order
+	if mHeap.Size() == 0 {
+		fmt.Println("ListOrder is empty")
+		return
+	}
+	j := 1
+	for{
+		s := mHeap.ExctractMax()
+		fmt.Print(j)
+		fmt.Println(": " + s.action.ServiceName)
+		j++
+		if mHeap.Size() == 0{
+			break
+		}
+	}
+}
 
 
 func (ll *LinkListService) Search(serviceName string) *Service {
