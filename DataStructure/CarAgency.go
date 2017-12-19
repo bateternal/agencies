@@ -130,7 +130,7 @@ func (s *Service) AddSubService(service *Service) {
 }
 
 func (a *Agency) AddOffer(service *Service) {
-	if service.sizeFather == nil {
+	if service.sizeFather == 0 {
 		service.sizeFather = 1
 	} else {
 		service.sizeFather++
@@ -163,6 +163,7 @@ func (ll *LinkListAgency) ListAgencies() {
 			head = head.next
 		}
 	}
+	fmt.Println()
 }
 
 func (ll *LinkListService) ListServices() {
@@ -172,18 +173,16 @@ func (ll *LinkListService) ListServices() {
 	} else {
 		for {
 			fmt.Println(head.ServiceName + "  ")
-			if head.next != nil {
-				fmt.Print("[ ")
+			if head.head != nil {
+				fmt.Println("[")
 				head.ListSubServices()
-				fmt.Println(" ]")
-			} else {
+				fmt.Println("]")
+			}
+			if head.next == nil {
 				break
 			}
 			head = head.next
 		}
-		fmt.Print("[ ")
-		head.ListSubServices()
-		fmt.Println(" ]")
 	}
 }
 
@@ -195,9 +194,9 @@ func (s *Service) ListSubServices() {
 		for {
 			fmt.Println(head.ServiceName + "  ")
 			if head.head != nil {
-				fmt.Print("[ ")
-				head.head.ListSubServices()
-				fmt.Println(" ]")
+				fmt.Println("[")
+				head.ListSubServices()
+				fmt.Println("]")
 			}
 			if head.next == nil {
 				break
@@ -205,13 +204,16 @@ func (s *Service) ListSubServices() {
 			head = head.next
 		}
 	}
-	fmt.Println()
 }
 
-func (a *Agency) Order(s *Service, Lvl int) {
+func (a *Agency) Order(s *Service, Lvl int,c string) {
+	if a.order == nil{
+		order := MaxHeap{}
+		a.order = &order
+	}
 	mHeap := a.order
 	i :=  Lvl*1000 - (len(mHeap.Orders) + 1)
-	order = Order{s,i}
+	order := Order{s,i,c}
 	mHeap.Insert(order)
 }
 
@@ -237,7 +239,6 @@ func (a *Agency) ListOrder() {
 func (ll *LinkListService) Search(serviceName string) *Service {
 	head := ll.head
 	if head == nil {
-		fmt.Println("no service already exist!")
 		return nil
 	}
 	for {

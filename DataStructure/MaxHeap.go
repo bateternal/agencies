@@ -4,6 +4,7 @@ package DataStructure
 type Order struct {
 	action   *Service
 	priority int
+	customer string
 }
 
 // MaxHeap - container for Order
@@ -12,7 +13,7 @@ type MaxHeap struct {
 }
 
 // NewPQueue - return pointer to MaxHeap instance
-func New(size int) *MaxHeap {
+func New() *MaxHeap {
 	return &MaxHeap{
 		Orders:  []Order{},
 	}
